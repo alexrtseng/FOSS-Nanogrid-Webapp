@@ -23,7 +23,7 @@ tcp_regs = [3060, #Active Power 3-ph
             3110  #Frequency
             ]
 
-class SmartMeter:
+class SmartMeterReciever:
     def __init__(self, name, host):
         self.name = name
         self.host = host
@@ -93,8 +93,8 @@ async def main (lst_SMeters):
 
 if __name__ == '__main__':
     lst_sm=[]
-    lst_sm.append(SmartMeter('Energy Center 1', '172.20.49.4'))
-    lst_sm.append(SmartMeter('STP-1', '172.20.49.3'))
+    lst_sm.append(SmartMeterReciever('Energy Center 1', '172.20.49.4'))
+    lst_sm.append(SmartMeterReciever('STP-1', '172.20.49.3'))
 
     
     asyncio.run(main(lst_sm))

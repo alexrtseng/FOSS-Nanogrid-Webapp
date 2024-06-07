@@ -1,7 +1,7 @@
 from unittest.util import _MAX_LENGTH
 from django.db import models
 
-class SmartMeters (models.Model):
+class SmartMeter (models.Model):
     ip_address = models.GenericIPAddressField(verbose_name="IP Address")
     field_name = models.CharField(max_length=255, verbose_name="Field Name")
     
@@ -19,3 +19,28 @@ class SmartMeters (models.Model):
     password = models.CharField(max_length=255, verbose_name="Password")
     secondary_id = models.BooleanField(default=False, verbose_name="Secondary Id") # secondary used instead of slave
 
+class ThirtyMinAvg(models.Model):
+    smart_meter = models.ForeignKey(SmartMeter, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField()
+    active = models.FloatField(blank=True, null=True)
+    reactive = models.FloatField(blank=True, null=True)
+    apparent = models.FloatField(blank=True, null=True)
+    freq = models.FloatField(blank=True, null=True)
+    humidity = models.FloatField(blank=True, null=True)
+    temperature = models.FloatField(blank=True, null=True)
+    irradiance = models.FloatField(blank=True, null=True)
+
+    def __str__(self):
+        return f"30 Min Avg - {self.smart_meter.field_name} at {self.timestamp}"
+
+
+class RealTimeMeter(models.Model):
+    smart_meter = models.ForeignKey(SmartMeter, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField()
+    active = models.FloatField(blank=True, null=True)
+    reactive = models.FloatField(blank=True, null=True)
+    apparent = models.FloatField(blank=True, null=True)
+    freq = models.FloatField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Real Time - {self.smart_meter.field_name} at {self.timestamp}"
