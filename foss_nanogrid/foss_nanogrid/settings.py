@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import boto3
+import environ
+SECRET_KEY = env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-n%myp5xrv8(j8f%4eydu4!$!42zbefu@hkb3=$!7zcdu*4+i%#'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,6 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_beat',
+    'django_celery_results',
+    'data_collection',
 ]
 
 MIDDLEWARE = [
@@ -75,8 +82,12 @@ WSGI_APPLICATION = 'foss_nanogrid.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': env("DB_NAME"),
+        'USER': env("DB_USER"),
+        'PASSWORD': env("DB_PASSWORD"),
+        'HOST': env("DB_HOST"),
+        'PORT': env("DB_PORT"),
     }
 }
 
@@ -135,3 +146,32 @@ LOGGING = {
         "level": "INFO",
     },
 }
+
+# Celery configurations
+CELERY_BROKER_URL = 'sqs://' #boto3 kombu wil automatically manage everythin for celery
+AWS_REGION = 'eu-north-1' #use your specified region
+
+CELERY_BROKER_TRANSPORT_OPTIONS = { #change accordingly
+    'region':AWS_REGION ,
+    'polling_interval': 3,   
+    'queue_name_prefix':'', 
+    'visibility_timeout': 3600,   
+}
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND =  'django-cache'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+CELERY_TIMEZONE = 'UTC'
+
+TASK_QUEUE_NAME = "foss_nanogrid_queue" #change accordingly as you have <Queue_Name>
+
+#make celery use json strictly
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_CONTENT_ENCODING = 'utf-8'
+
+#AWS Credentials
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+AWS_DEFAULT_REGION = 'eu-north-1'
