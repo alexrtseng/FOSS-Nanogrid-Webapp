@@ -1,3 +1,8 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 
-# Create your views here.
+from data_collection.add_smart_meters import add_file_sm
+
+def add_sm(request):
+    add_file_sm()
+    return HttpResponse("Hello world!")

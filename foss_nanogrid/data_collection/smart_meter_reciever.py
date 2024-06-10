@@ -1,10 +1,9 @@
 import logging
+from xmlrpc.client import Boolean
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-import asyncio
-
-from pymodbus.client import AsyncModbusTcpClient as ModbusClient
+from pymodbus.client import ModbusTcpClient as ModbusClient
 from pymodbus.payload import BinaryPayloadDecoder
 from pymodbus.constants import Endian
 from pymodbus.exceptions import ModbusException as Exception
@@ -50,22 +49,22 @@ class SmartMeterReciever:
         self.source_address.append(address)
 
     # Open connection
-    async def connect(self):
+    def connect(self):
         log.info("Connecting to Smart Meter " + self.name + " ...")
         try:
             self.client = ModbusClient(host=self.host, port=self.port, timeout=self.timeout)
-            await self.client.connect()
+            self.client.connect()
         except Exception as exc:
             log.error(f"Client connection failed: ({exc})")
             return False
         return True
 
     # Get smart meter data for instance; connection must be opened by above function
-    async def get_sm_data(self) -> dict | None:
+    def get_sm_data(self) -> dict | bool:
         vals=[]
         try:
             for addr in self.source_address:
-                response = await self.client.read_holding_registers((addr)-2,count=3, slave=1)
+                response = self.client.read_holding_registers((addr)-2,count=3, slave=1)
                 if not response.isError():
                     rr = self._conv_to_32bitfloat(response.registers)
                     log.info(rr)
@@ -74,21 +73,25 @@ class SmartMeterReciever:
                     log.error(f"Reg. error at {addr}: {response}")
         except Exception as exc:
             log.error(f"Received Modbus Exception({exc}) from Library")
-            await self.client.close()
-            return 
+            self.client.close()
+            return False
         
         log.info('---------------------------------------------')
-        return {'active': vals[0], 'reactive': vals[1], 'apparent': vals[2], 'power_factor': vals[3], 'freq': vals[4]}
+        if len(vals) >= 1:
+            return {'active': vals[0], 'reactive': vals[1], 'apparent': vals[2], 'power_factor': vals[3], 'freq': vals[4]}
+        else:
+            return False
+
 
 # Test with two SM; print in log.info
 # Connection is not super stable
-async def main (lst_SMeters):
+def main (lst_SMeters):
     while (datetime.datetime.now() < end_loop_date):
         vals=[]
         for SM in lst_SMeters:
-            await SM.connect()
-            vals.append(await SM.get_sm_data())
-        await asyncio.sleep(SLEEP_INTERVAL)
+            SM.connect()
+            vals.append(SM.get_sm_data())
+        time.sleep(SLEEP_INTERVAL)
 
 
 if __name__ == '__main__':
@@ -96,7 +99,6 @@ if __name__ == '__main__':
     lst_sm.append(SmartMeterReciever('Energy Center 1', '172.20.49.4'))
     lst_sm.append(SmartMeterReciever('STP-1', '172.20.49.3'))
 
-    
-    asyncio.run(main(lst_sm))
+    main(lst_sm)
 
     print('---------------------------------------------')
