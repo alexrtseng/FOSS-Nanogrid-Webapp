@@ -1,16 +1,19 @@
+import asyncio
 import logging
 from xmlrpc.client import Boolean
+
+#from foss_nanogrid.data_collection.tasks import get_sm_data_task
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-from pymodbus.client import ModbusTcpClient as ModbusClient
+from pymodbus.client import AsyncModbusTcpClient as ModbusClient
 from pymodbus.payload import BinaryPayloadDecoder
 from pymodbus.constants import Endian
 from pymodbus.exceptions import ModbusException as Exception
 import datetime, time
 from datetime import datetime as dt
 
-SLEEP_INTERVAL = 15 #seconds
+SLEEP_INTERVAL = 5 #seconds
 TIME_STOP = 2 #minutes of data collection 
 end_loop_date = datetime.datetime.now() + datetime.timedelta(minutes=TIME_STOP)
 
@@ -49,22 +52,22 @@ class SmartMeterReciever:
         self.source_address.append(address)
 
     # Open connection
-    def connect(self):
+    async def connect(self):
         log.info("Connecting to Smart Meter " + self.name + " ...")
         try:
             self.client = ModbusClient(host=self.host, port=self.port, timeout=self.timeout)
-            self.client.connect()
+            await self.client.connect()
         except Exception as exc:
             log.error(f"Client connection failed: ({exc})")
             return False
         return True
 
     # Get smart meter data for instance; connection must be opened by above function
-    def get_sm_data(self) -> dict | bool:
+    async def get_sm_data(self) -> dict | bool:
         vals=[]
         try:
             for addr in self.source_address:
-                response = self.client.read_holding_registers((addr)-2,count=3, slave=1)
+                response = await self.client.read_holding_registers((addr)-2,count=3, slave=1)
                 if not response.isError():
                     rr = self._conv_to_32bitfloat(response.registers)
                     log.info(rr)
@@ -85,12 +88,14 @@ class SmartMeterReciever:
 
 # Test with two SM; print in log.info
 # Connection is not super stable
-def main (lst_SMeters):
+async def main (lst_SMeters):
+    for SM in lst_SMeters:
+        await SM.connect()
+    
     while (datetime.datetime.now() < end_loop_date):
         vals=[]
         for SM in lst_SMeters:
-            SM.connect()
-            vals.append(SM.get_sm_data())
+            vals.append(await SM.get_sm_data())
         time.sleep(SLEEP_INTERVAL)
 
 
@@ -99,6 +104,6 @@ if __name__ == '__main__':
     lst_sm.append(SmartMeterReciever('Energy Center 1', '172.20.49.4'))
     lst_sm.append(SmartMeterReciever('STP-1', '172.20.49.3'))
 
-    main(lst_sm)
+    asyncio.run(main(lst_sm))
 
     print('---------------------------------------------')
