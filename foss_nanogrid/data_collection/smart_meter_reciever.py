@@ -60,7 +60,7 @@ class SmartMeterReciever:
         return True
 
     # Get smart meter data for instance; connection must be opened by above function
-    def get_sm_data(self) -> dict | bool:
+    def _get_sm_data(self) -> dict | bool:
         # Pre-celery code:
         self._connect()
         vals = []
@@ -100,7 +100,7 @@ def main(lst_SMeters):
         minutes=2
     ):
         for SM in lst_SMeters:
-            SM.get_sm_data()
+            SM._get_sm_data()
         time.sleep(5)
 
 

@@ -1,4 +1,3 @@
-from unittest.util import _MAX_LENGTH
 from django.db import models
 
 
@@ -27,8 +26,8 @@ class SmartMeter(models.Model):
     comments = models.TextField(null=True, blank=True, verbose_name="Comments")
     username = models.CharField(max_length=255, verbose_name="Username")
     password = models.CharField(max_length=255, verbose_name="Password")
-    secondary_id = models.BooleanField(
-        default=False, verbose_name="Secondary Id"
+    secondary_id = models.PositiveSmallIntegerField(
+        default=1, verbose_name="Secondary Id",
     )  # secondary used instead of slave
 
 
@@ -43,6 +42,7 @@ class ThirtyMinAvg(models.Model):
     humidity = models.FloatField(blank=True, null=True)
     temperature = models.FloatField(blank=True, null=True)
     irradiance = models.FloatField(blank=True, null=True)
+    data_points = models.PositiveIntegerField(blank=False, null=False, default=0)
 
     def __str__(self):
         return f"30 Min Avg - {self.smart_meter.field_name} at {self.timestamp}"
