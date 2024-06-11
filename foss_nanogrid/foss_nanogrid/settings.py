@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_celery_beat",
     "django_celery_results",
+    "rest_framework",
     "data_collection",
+    "metrics",
 ]
 
 MIDDLEWARE = [
@@ -135,18 +137,34 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/Users/alextseng/Desktop/Summer 2024/FOSS Nanogrid Webapp/foss_nanogrid/data_collection/logs/backend.log',
+            'maxBytes': 1024 * 1024 * 5,  # 5MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+            'level': 'ERROR'
         },
     },
-    "root": {
-        "handlers": ["console"],
-        "level": "INFO",
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} {levelname} {filename} {lineno} {message}',
+            'style': '{',  # Use braces for string formatting
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'DEBUG',
     },
 }
+
 
 # Celery configurations
 CELERY_BROKER_URL = (

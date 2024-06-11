@@ -5,7 +5,6 @@ from data_collection.smart_meter_reciever import SmartMeterReciever
 from data_collection.models import RealTimeMeter, SmartMeter
 
 log = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 from celery import shared_task
 from pymodbus.client import ModbusTcpClient as ModbusClient
 from celery import app

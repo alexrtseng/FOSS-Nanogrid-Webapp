@@ -31,3 +31,4 @@ def start_data_collection(request):
     )
 
     return HttpResponse("Data collection started")
+    

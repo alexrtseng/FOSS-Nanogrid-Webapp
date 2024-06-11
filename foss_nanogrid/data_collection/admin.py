@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+admin.site.register(SmartMeter)
+admin.site.register(RealTimeMeter)
+admin.site.register(ThirtyMinAvg)
