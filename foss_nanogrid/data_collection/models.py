@@ -27,7 +27,8 @@ class SmartMeter(models.Model):
     username = models.CharField(max_length=255, verbose_name="Username")
     password = models.CharField(max_length=255, verbose_name="Password")
     secondary_id = models.PositiveSmallIntegerField(
-        default=1, verbose_name="Secondary Id",
+        default=1,
+        verbose_name="Secondary Id",
     )  # secondary used instead of slave
 
 
@@ -39,9 +40,19 @@ class ThirtyMinAvg(models.Model):
     apparent = models.FloatField(blank=True, null=True)
     power_factor = models.FloatField(blank=True, null=True)
     freq = models.FloatField(blank=True, null=True)
+
+    # Weather data from Xweather API; see Xweather API documentation for variable descriptions
+    temp_C = models.FloatField(blank=True, null=True)
     humidity = models.FloatField(blank=True, null=True)
-    temperature = models.FloatField(blank=True, null=True)
-    irradiance = models.FloatField(blank=True, null=True)
+    feels_like_C = models.FloatField(blank=True, null=True)
+    wind_dir_deg = models.FloatField(blank=True, null=True)
+    wind_speed_kph = models.FloatField(blank=True, null=True)
+    ghi_Wm2 = models.FloatField(blank=True, null=True)
+    precip_mm = models.FloatField(blank=True, null=True)
+    sky = models.FloatField(blank=True, null=True)
+    visibility_km = models.FloatField(blank=True, null=True)
+    dewpoint_C = models.FloatField(blank=True, null=True)
+
     data_points = models.PositiveIntegerField(blank=False, null=False, default=0)
 
     def __str__(self):

@@ -63,9 +63,15 @@ def _get_all_sm_data():
             name=sm.field_name,
         )
 
+# celery task for getting all smart meter data
 @shared_task
 def get_all_sm_data():
     _get_all_sm_data()
+
+# get terperature data for one smart meter
+#def _get_temp_data(sm: SmartMeter):
+    
+
 
 def _calc_thirty_min_avg(dt=datetime.datetime.now()):
     # get all smart meters
@@ -103,7 +109,8 @@ def _calc_thirty_min_avg(dt=datetime.datetime.now()):
             data_points=num_data_points,
         )
 
-        # eventually need a function to call api's for temperature, humidity, and irradiance data
+        # Call for temperature data
+
 
         # delete all real time meters older than 30 minutes
         rt_meters.filter(timestamp__lt=dt - datetime.timedelta(minutes=REAL_TIME_DATA_BACKLOG)).delete()
