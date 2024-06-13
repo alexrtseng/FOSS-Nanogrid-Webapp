@@ -10,7 +10,7 @@ import datetime, time
 from datetime import datetime as dt
 
 # Register add. for given parameters
-tcp_regs = [
+TCP_REGS = [
     3060,  # Active Power 3-ph
     3068,  # Reactive Power 3-ph
     3076,  # Apparent Power 3-ph
@@ -20,12 +20,13 @@ tcp_regs = [
 
 
 class SmartMeterReciever:
+    PORT = 502
+    TIMEOUT = 0.2
+    SOURCE_ADDRESS = TCP_REGS
+
     def __init__(self, name, host):
         self.name = name
         self.host = host
-        self.port = 502
-        self.source_address = tcp_regs
-        self.timeout = 0.2
         self.client = None
 
     @staticmethod
@@ -52,7 +53,7 @@ class SmartMeterReciever:
         log.info("Connecting to Smart Meter " + self.name + " ...")
         try:
             self.client = ModbusClient(
-                host=self.host, port=self.port, timeout=self.timeout
+                host=self.host, port=self.PORT, timeout=self.TIMEOUT
             )
         except Exception as exc:
             log.error(f"Client connection failed: ({exc})")
@@ -65,7 +66,7 @@ class SmartMeterReciever:
         self._connect()
         vals = []
         try:
-            for addr in self.source_address:
+            for addr in self.SOURCE_ADDRESS:
                 response = self.client.read_holding_registers(
                     (addr) - 2, count=3, slave=1
                 )

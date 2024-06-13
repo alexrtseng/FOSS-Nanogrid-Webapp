@@ -51,9 +51,21 @@ def _get_sm_data(source_address, host, port, timeout, name, secondary_id=1, regs
             freq=vals[4],
         )
 
+# get data from all smart meters; reduces celery task messages
+def _get_all_sm_data():
+    smart_meters = SmartMeter.objects.all()
+    for sm in smart_meters:
+        _get_sm_data(
+            source_address=SmartMeterReciever.SOURCE_ADDRESS,
+            host=sm.ip_address,
+            port=SmartMeterReciever.PORT,
+            timeout=SmartMeterReciever.TIMEOUT,
+            name=sm.field_name,
+        )
+
 @shared_task
-def get_sm_data(source_address, host, port, timeout, name, secondary_id=1, regs=5):
-    _get_sm_data(source_address, host, port, timeout, name, secondary_id, regs)
+def get_all_sm_data():
+    _get_all_sm_data()
 
 def _calc_thirty_min_avg(dt=datetime.datetime.now()):
     # get all smart meters
