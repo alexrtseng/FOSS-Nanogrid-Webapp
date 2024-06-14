@@ -6,6 +6,9 @@ source /Users/alextseng/Desktop/Summer 2024/FOSS Nanogrid Webapp/.venv/bin/activ
 # Navigate to your Django project directory
 cd foss_nanogrid
 
+# Run Tests
+python manage.py test
+
 # Start Celery worker
 celery -A foss_nanogrid worker -l INFO &
 
