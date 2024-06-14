@@ -7,7 +7,7 @@ import logging
 from data_collection.models import SmartMeter
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
-FILE_NAME = '/Users/alextseng/Desktop/Summer 2024/FOSS Nanogrid Webapp/foss_nanogrid/data_collection/smart_meters/ucy_sm_modbus_map.csv'
+FILE_NAME = 'data_collection/smart_meters/ucy_sm_modbus_map.csv'
 
 def add_file_sm(file_name):
     import csv
