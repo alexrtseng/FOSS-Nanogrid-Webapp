@@ -8,6 +8,7 @@ from data_collection.models import RealTimeMeter, SmartMeter, ThirtyMinAvg
 log = logging.getLogger(__name__)
 from celery import shared_task
 from pymodbus.client import ModbusTcpClient as ModbusClient
+from pymodbus.exceptions import ConnectionException
 from django.db import models
 import environ
 import pytz
@@ -29,7 +30,7 @@ def _get_sm_data(
     try:
         client = ModbusClient(host=host, port=port, timeout=timeout)
     except Exception as exc:
-        log.error(f"Client connection failed: ({exc})")
+        log.error(f"Failed to establish ModbusClient: ({exc})")
         return
     try:
         for addr in source_address:
@@ -38,17 +39,21 @@ def _get_sm_data(
             )
             if not response.isError():
                 rr = SmartMeterReciever.conv_to_32bitfloat(response.registers)
-                log.debug(rr)
                 vals.append(rr)
             else:
                 pass
-                log.info(f"Reg. error at {addr}: {response}")
+                log.debug(f"Reg. error at {addr}: {response}")
+    except ConnectionException as exc:
+        log.info(f"Failed to connect to SM: {name}")
+        client.close()
+
     except Exception as exc:
-        log.error(f"Received Modbus Exception({exc}) from Library")
+        log.error(f"Received Modbus Exception: {exc}")
         client.close()
         return
 
     if len(vals) == regs:
+        SmartMeter.objects.filter(field_name=name).update(recieving_info=True)
         RealTimeMeter.objects.create(
             smart_meter=SmartMeter.objects.get(field_name=name),
             timestamp=datetime.datetime.now(timezone),
@@ -58,7 +63,8 @@ def _get_sm_data(
             power_factor=vals[3],
             freq=vals[4],
         )
-
+    else:
+        SmartMeter.objects.filter(field_name=name).update(recieving_info=False)
 
 # get data from all smart meters; reduces celery task messages
 def _get_all_sm_data():
