@@ -85,7 +85,7 @@ WSGI_APPLICATION = "foss_nanogrid.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": "django.db.backends.mysql",
         "NAME": env("DB_NAME"),
         "USER": env("DB_USER"),
         "PASSWORD": env("DB_PASSWORD"),
@@ -123,7 +123,7 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_TZ = False  # naive time
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -146,11 +146,11 @@ LOGGING = {
         },
         'file': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/Users/alextseng/Desktop/Summer 2024/FOSS Nanogrid Webapp/foss_nanogrid/data_collection/logs/backend.log',
+            'filename': '/Users/alextseng/Desktop/Summer 2024/FOSS Nanogrid Webapp/foss_nanogrid/logs/backend.log',
             'maxBytes': 1024 * 1024 * 5,  # 5MB
             'backupCount': 5,
             'formatter': 'verbose',
-            'level': 'ERROR'
+            'level': 'INFO'
         },
     },
     'formatters': {
@@ -162,6 +162,13 @@ LOGGING = {
     'root': {
         'handlers': ['console', 'file'],
         'level': 'DEBUG',
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
     },
 }
 
