@@ -1,0 +1,23 @@
+﻿Distribution Board,Field name,Latitude,Longitude,Feeder connection,Feeder,Seial No.,IP Address,Modbus Port,MAC Address,Installed?,Comments,Username,Password,Device Id
+PV Lab 2,PV_Lab2_SM1,35.146032,35.146032,,Incomer,ME-1805A335-02,172.20.49.1,502,6078092430,Yes,,admin,0,1
+PV Lab 2,PV_Lab2_SM2,35.145986,33.416808,,"Chillers, Climatic",ME-1805A279-02,172.20.49.2,502,00607809232f,Yes,,admin,0,1
+Sewage Treatment Plant,STP_SM1,35.146155,33.416462,,PV Park,ME-1801C728-02,172.20.49.3,502,6078089179,Yes,"No Load, only PV Generation (sign correct)",admin,0,1
+Energy Centre,EC_SM1,35.146506,33.415653,TRS4,Incomer,ME-1801C724-02,172.20.49.4,502,6078089165,Yes,,admin,0,1
+"Energy Centre 
+(Chillers 1 - 2)",EC_SM2,35.1465,33.415682,TRS13a,Chillers 1 & 2,ME-1810A840-02,172.20.49.5,502,0060780a2478,Yes,CT inverted,admin,0,1
+"Energy Centre 
+(Chillers 3 - 4)",EC_SM3,35.146503,33.415689,TRS13b,Chillers 3 & 4,ME-1809A875-02,172.20.49.6,502,00607809f8f0,Yes,,admin,0,1
+"Energy Centre 
+(Chillers 5 - 6)",EC_SM4,35.146478,33.415719,TRS13c,Chillers 5 & 6,ME-1809A970-02,172.20.49.7,502,00607809faa4,Yes,,admin,0,1
+"Energy Centre 
+(Chillers 7 - 8)",EC_SM5,35.146466,33.415741,TRS13d,Chillers 7 & 8,ME-1810A744-02,172.20.49.8,502,0060780a226a,Yes,,admin,0,1
+Athletic Center Sports,ACS_SM1,35.143815,33.413677,TRS6,Incomer,ME-1801C730-02,172.20.49.9,502,,Yes - No Communication,,admin,0,1
+Athletic Hall,ACS_SM2,35.146088,33.413514,TRS5,Incomer,ME-1805B060-02,172.20.49.10,502,6078093234,Yes,,admin,0,1
+Administration Building,AB_SM1,35.145737,33.410411,TRS2,Incomer,ME-1804C200-02,172.20.49.11,502,00607809108e,Yes,,admin,0,1
+Facilities for Science 1,FSC_SM1,35.14469,33.410216,TRS7 (fst01),Incomer 2,ME-1804C089-02,172.20.49.12,502,006078090e3b,Yes,,admin,0,1
+Facilities for Science 2,FSC_SM2,35.144669,33.410251,TRS7 (fst02),Incomer 1,ME-1085A133-02,172.20.49.13,502,00607809204f,Yes,,admin,0,1
+Student Halls,SH_SM1,35.14384,33.404673,TRS1,Incomer,ME-1805A318-02,172.20.49.14,502,0060780923eb,Yes,CT correct. There is a lot of PV gebneration. At mid-day maximum generation and minimum load.,admin,0,1
+Social Facilities,SFC_SM1,35.144733,33.408891,TRS11,Incomer,ME-1804C182-02,172.20.49.15,502,6078091025,Yes,,admin,0,1
+Faculty of Economics,FEM_SM1,35.14523,33.411648,TRS14,Incomer,ME-1804C180-02,172.20.49.16,502,00607809102f,Yes,,admin,0,1
+Library,L_SM1,35.146965,33.412393,,Incomer 1,ME-1707A311-02,172.20.49.17,502,0060780798f4,To be intalled Week 47,,admin,0,1
+Library,L_SM2,35.146879,33.412429,,Incomer 2,ME-1801C736-02,172.20.49.18,502,00607808919c,To be intalled Week 47,,admin,0,1
