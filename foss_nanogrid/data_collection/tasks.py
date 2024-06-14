@@ -1,6 +1,5 @@
 import datetime
 import logging
-
 import requests
 
 from data_collection.smart_meter_reciever import SmartMeterReciever
@@ -11,6 +10,7 @@ from celery import shared_task
 from pymodbus.client import ModbusTcpClient as ModbusClient
 from django.db import models
 import environ
+import pytz
 
 env = environ.Env()
 environ.Env.read_env()
@@ -21,7 +21,9 @@ XWEATHER_BASE_URL = "https://api.aerisapi.com/conditions"
 
 
 # get smart meter data task
-def _get_sm_data(source_address, host, port, timeout, name, secondary_id=1, regs=5):
+def _get_sm_data(
+    source_address, host, port, timeout, name, timezone, secondary_id=1, regs=5
+):
     vals = []  # values from smart meter
     log.debug("Connecting to Smart Meter " + name + " ...")
     try:
@@ -49,7 +51,7 @@ def _get_sm_data(source_address, host, port, timeout, name, secondary_id=1, regs
     if len(vals) == regs:
         RealTimeMeter.objects.create(
             smart_meter=SmartMeter.objects.get(field_name=name),
-            timestamp=datetime.datetime.now(),
+            timestamp=datetime.datetime.now(timezone),
             active=vals[0],
             reactive=vals[1],
             apparent=vals[2],
@@ -62,12 +64,15 @@ def _get_sm_data(source_address, host, port, timeout, name, secondary_id=1, regs
 def _get_all_sm_data():
     smart_meters = SmartMeter.objects.all()
     for sm in smart_meters:
+        timezone = pytz.timezone(sm.timezone)
+
         _get_sm_data(
             source_address=SmartMeterReciever.SOURCE_ADDRESS,
             host=sm.ip_address,
             port=SmartMeterReciever.PORT,
             timeout=SmartMeterReciever.TIMEOUT,
             name=sm.field_name,
+            timezone=timezone,
         )
 
 
@@ -76,6 +81,7 @@ def _get_all_sm_data():
 def get_all_sm_data():
     log.info("Getting all smart meter data...")
     _get_all_sm_data()
+
 
 # calculate weather data in dictionary style as recieved from Xweather API
 def _calc_weather_data(weather_data: dict):
@@ -116,6 +122,7 @@ def _calc_weather_data(weather_data: dict):
         "dewpoint_C": dewpoint_C / num_periods,
     }
 
+
 # get terperature data for one smart meter
 def _get_temp_data(sm: SmartMeter, params: dict):
     response = requests.get(
@@ -140,21 +147,22 @@ def _get_temp_data(sm: SmartMeter, params: dict):
         return False
 
 
-def _calc_thirty_min_avg(dt=datetime.datetime.now()):
-    # define parameters for http request to Xweather API
-    params = {
-        "format": "json",
-        "filter": "10min",
-        "client_id": "SK97xhuiT4ZtBULDLHvhi",
-        "client_secret": "4ZSPcFgnNS4gJOLSDpa6XMxxfMEQ4EpOYirMt46U",
-        "from": f"{datetime.datetime.now() - datetime.timedelta(minutes=30)}",
-        "to": f"{datetime.datetime.now()}",
-    }
-
+def _calc_thirty_min_avg():
     # get all smart meters
     smart_meters = SmartMeter.objects.all()
     log.info("Calculating 30 minute averages...")
     for sm in smart_meters:
+        dt = datetime.datetime.now(pytz.timezone(sm.timezone))
+
+        # define parameters for http request to Xweather API
+        params = {
+            "format": "json",
+            "filter": "10min",
+            "client_id": "SK97xhuiT4ZtBULDLHvhi",
+            "client_secret": "4ZSPcFgnNS4gJOLSDpa6XMxxfMEQ4EpOYirMt46U",
+            "from": f"{dt - datetime.timedelta(minutes=30)}",
+            "to": f"{dt}",
+        }
 
         # get all real time meters for the smart meter
         rt_meters = RealTimeMeter.objects.filter(smart_meter=sm)
@@ -209,5 +217,5 @@ def _calc_thirty_min_avg(dt=datetime.datetime.now()):
 
 
 @shared_task
-def calc_thirty_min_avg(dt=datetime.datetime.now()):
-    _calc_thirty_min_avg(dt)
+def calc_thirty_min_avg():
+    _calc_thirty_min_avg()

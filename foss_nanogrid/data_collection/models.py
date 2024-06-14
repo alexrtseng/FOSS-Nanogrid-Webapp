@@ -30,6 +30,7 @@ class SmartMeter(models.Model):
         default=1,
         verbose_name="Secondary Id",
     )  # secondary used instead of slave
+    timezone = models.CharField(max_length=255, verbose_name="Timezone", default="Europe/Nicosia")
 
 
 class ThirtyMinAvg(models.Model):
