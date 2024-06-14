@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import boto3
 import environ
+import os
 
 SECRET_KEY = env = environ.Env()
 environ.Env.read_env()
@@ -146,7 +147,7 @@ LOGGING = {
         },
         'file': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/Users/alextseng/Desktop/Summer 2024/FOSS Nanogrid Webapp/foss_nanogrid/logs/backend.log',
+            'filename': 'logs/backend.log',
             'maxBytes': 1024 * 1024 * 5,  # 5MB
             'backupCount': 5,
             'formatter': 'verbose',
@@ -158,10 +159,6 @@ LOGGING = {
             'format': '{asctime} {levelname} {filename} {lineno} {message}',
             'style': '{',  # Use braces for string formatting
         },
-    },
-    'root': {
-        'handlers': ['console', 'file'],
-        'level': 'DEBUG',
     },
     'loggers': {
         '': {
