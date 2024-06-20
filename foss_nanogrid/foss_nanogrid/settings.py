@@ -46,11 +46,13 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "django_celery_results",
     "rest_framework",
+    "corsheaders",
     "data_collection",
     "metrics",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -61,6 +63,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "foss_nanogrid.urls"
+CORS_ALLOW_ALL_ORIGINS = True # Change for production
 
 TEMPLATES = [
     {
