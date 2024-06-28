@@ -164,8 +164,8 @@ def _calc_thirty_min_avg():
         params = {
             "format": "json",
             "filter": "10min",
-            "client_id": "SK97xhuiT4ZtBULDLHvhi",
-            "client_secret": "4ZSPcFgnNS4gJOLSDpa6XMxxfMEQ4EpOYirMt46U",
+            "client_id": XWEATHER_CLIENT_ID,
+            "client_secret": XWEATHER_CLIENT_SECRET,
             "from": f"{dt - datetime.timedelta(minutes=30)}",
             "to": f"{dt}",
         }
