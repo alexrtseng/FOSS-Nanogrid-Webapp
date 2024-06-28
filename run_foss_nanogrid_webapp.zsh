@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # Activate your virtual environment
-source /Users/alextseng/Desktop/Summer 2024/FOSS Nanogrid Webapp/.venv/bin/activate
+source /.venv/bin/activate
 
 # Navigate to your Django project directory
 cd foss_nanogrid
