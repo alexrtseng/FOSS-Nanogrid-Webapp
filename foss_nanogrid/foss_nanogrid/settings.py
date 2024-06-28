@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "data_collection",
     "metrics",
+    "forecasting",
 ]
 
 MIDDLEWARE = [
