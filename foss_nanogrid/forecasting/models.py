@@ -9,3 +9,5 @@ class PVPanel(models.Model):
     longitude = models.DecimalField(
         max_digits=9, decimal_places=6, verbose_name="Longitude"
     )
+    inclination = models.FloatField(verbose_name="Inclination")
+    azimuth = models.FloatField(verbose_name="Azimuth")
