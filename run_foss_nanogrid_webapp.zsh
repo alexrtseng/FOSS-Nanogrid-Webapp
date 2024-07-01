@@ -7,7 +7,7 @@ source /.venv/bin/activate
 cd foss_nanogrid
 
 # Run Tests
-python manage.py test
+# python manage.py test  # Commented out b/c of database permissions
 
 # Start Celery worker
 celery -A foss_nanogrid worker -l INFO &
