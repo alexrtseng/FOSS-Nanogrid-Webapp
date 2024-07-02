@@ -1,3 +1,10 @@
+'''
+NOT IN USE 
+Running these tasks asyncronously with a return value will add additional 
+logic. Although this would be useful for high throughput requirements, 
+it is overly complicated to implement for UCY.
+'''
+
 from celery import shared_task
 import pandas as pd
 import numpy as np

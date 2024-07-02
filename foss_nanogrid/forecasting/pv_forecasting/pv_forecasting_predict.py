@@ -69,6 +69,9 @@ class PVPredict():
     def __init__(self):
         self.regs = self._load_models()
 
+    def __bool__(self):
+        return True
+
     # Load the models from files
     def _load_models(self) -> list:
         regs = []
@@ -83,6 +86,7 @@ class PVPredict():
         # Make batch (requests) param for API call (signifigantly reduces number of calls to API)
         num_required_calls = math.ceil(((end - start).seconds / 3600) + (end - start).days * 24) if min_resolution else (end - start).days + 1
         assert num_required_calls <= 31, "Number of requests must be under 31"
+        assert num_required_calls > 0, "Number of requests must be greater than 0"
         log.debug(f'Num of calls in batch: {num_required_calls}')
         batch_param_base_url = f'/conditions/{pv.latitude},{pv.longitude}'  # CHANGE TO FORECAST FOR FUTURE PREDICTIONS
         requests_param = ''
@@ -199,18 +203,55 @@ class PVPredict():
             return sum / np.sum(MODEL_ACC_WEIGHTS)
 
     # Forecast PV Power Output for range between start and end with minute resolution of resolution
-    def forecast_pv_timestamp_range(self, start: pd.Timestamp, end: pd.Timestamp, pv: PVPanel, resolution: int=30, min_resolution: bool=True, all_models: bool=True) -> pd.DataFrame:
+    def forecast_pv_timestamp_range(self, start: pd.Timestamp, end: pd.Timestamp, pv: PVPanel, resolution: int=30, min_resolution: bool=True, all_models: bool=True, capacity=1.0) -> pd.DataFrame:
+        # Check legitimate input
+        assert start < end, "Start must be before end"
+        
         # Create a dataframe of features
         df_features = self._get_weather_features(start, end, resolution, min_resolution, pv)
+        if not isinstance(df_features, pd.DataFrame):
+            return False
+        
         datetime_col = df_features['datetime']
         df_features = self._create_time_features(df_features)
 
         # Forecast the PV power output
         predictions = self._forecast_pv(df_features, all_models)
+        predictions = predictions * capacity
         return pd.DataFrame({
             'datetime': datetime_col,
             'Pac_pred': predictions
         })
+    
+    # Take predictions data from (columns: datetime, Pac_pred) and creates json file in SolarCast format
+    # **kwargs: pv - PVPanel object, date_run - date the forecast model was run
+    @staticmethod
+    def forecasted_power_to_json(_predictions: pd.DataFrame, model='XGBoost_v1_all_models', **kwargs) -> dict:
+        predictions = _predictions.sort_values(by='datetime').copy()
+        values = []
+        for index, row in predictions.iterrows():
+            values.append({
+                'Timestamp': row['datetime'],
+                'kW': row['Pac_pred']
+            })
+
+        if 'pv' in kwargs and len(values) >= 1:
+            return {
+                'pv': kwargs['pv'].name,
+                'latitude': kwargs['pv'].latitude,
+                'longitude': kwargs['pv'].longitude,
+                'capacity': kwargs['pv'].capacity,
+                'unit': 'kW',
+                'model': model,
+                'date_run' : pd.Timestamp.now() if 'date_run' not in kwargs else kwargs['date_run'],
+                'forecasted_dates' : f"{values[0]['Timestamp']} to {values[-1]['Timestamp']}",
+                'values': values
+            }
+        else:
+            return {
+                'values': values
+            }
+
 
         
         

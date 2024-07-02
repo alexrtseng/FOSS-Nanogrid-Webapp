@@ -11,3 +11,9 @@ class PVPanel(models.Model):
     )
     inclination = models.FloatField(verbose_name="Inclination")
     azimuth = models.FloatField(verbose_name="Azimuth")
+    capacity = models.FloatField(verbose_name="Capacity")
+
+class Prediction(models.Model):
+    pv = models.ForeignKey(PVPanel, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField()
+    prediction_json = models.JSONField()
