@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import pandas as pd
 import xgboost as xgb
@@ -226,7 +227,7 @@ class PVPredict():
     # Take predictions data from (columns: datetime, Pac_pred) and creates json file in SolarCast format
     # **kwargs: pv - PVPanel object, date_run - date the forecast model was run
     @staticmethod
-    def forecasted_power_to_json(_predictions: pd.DataFrame, model='XGBoost_v1_all_models', **kwargs) -> dict:
+    def forecasted_power_to_dict(_predictions: pd.DataFrame, model='XGBoost_v1_all_models', **kwargs) -> dict:
         predictions = _predictions.sort_values(by='datetime').copy()
         values = []
         for index, row in predictions.iterrows():
@@ -236,23 +237,23 @@ class PVPredict():
             })
 
         if 'pv' in kwargs and len(values) >= 1:
-            return {
+            forecast_dict = {
                 'pv': kwargs['pv'].name,
                 'latitude': kwargs['pv'].latitude,
                 'longitude': kwargs['pv'].longitude,
                 'capacity': kwargs['pv'].capacity,
                 'unit': 'kW',
                 'model': model,
-                'date_run' : pd.Timestamp.now() if 'date_run' not in kwargs else kwargs['date_run'],
+                'date_run' : pd.Timestamp.now(tz='UTC') if 'date_run' not in kwargs else kwargs['date_run'],
                 'forecasted_dates' : f"{values[0]['Timestamp']} to {values[-1]['Timestamp']}",
                 'values': values
             }
         else:
-            return {
+            forecast_dict = {
                 'values': values
             }
 
-
+        return forecast_dict
         
         
 

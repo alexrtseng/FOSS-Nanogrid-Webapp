@@ -74,7 +74,7 @@ def forecast_pv(request):
         log.info("Failure in forecast_pv_timestamp_range")
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    predictions_json = PVPredict.forecasted_power_to_json(predictions, pv=pv)
+    predictions_json = PVPredict.forecasted_power_to_dict(predictions, pv=pv)
     return Response(predictions_json, status=status.HTTP_200_OK)
     
 
