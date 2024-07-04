@@ -8,12 +8,6 @@ from ..helper_functions.weather_api import get_weather_data_batch
 from ..models import PVPanel
 log = logging.getLogger(__name__)
 
-env = environ.Env()
-environ.Env.read_env(env_file='././foss_nanogrid/.env')
-XWEATHER_CLIENT_ID = env("XWEATHER_CLIENT_ID")
-XWEATHER_CLIENT_SECRET = env("XWEATHER_CLIENT_SECRET")
-XWEATHER_BASE_URL = "https://api.aerisapi.com/"  # Different from one in data_collection (for batch feature)
-
 """
 List of weights for model decision averaging based on accuracy
 calculated in model training; index 1 is best singular model
