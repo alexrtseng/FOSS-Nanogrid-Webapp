@@ -41,6 +41,7 @@ XGBoost models. Models trained/tested on UCYdemo data from 2019-2023 and cross v
 with 6 folds for a MAPE of ~1.43% (weighted avg. of 6 models).
 Model files have been saved in native XGBoost binary format in the pv_models folder. 
 Naming convention should follow: 'xgboost_pv_model_{#}.bin' with # indexing from 0
+Takes local time and works in local time
 """
 
 class PVPredict():
@@ -159,7 +160,7 @@ class PVPredict():
     # Take predictions data from (columns: datetime, Pac_pred) and creates json file in SolarCast format
     # **kwargs: pv - PVPanel object, date_run - date the forecast model was run
     @staticmethod
-    def forecasted_power_to_dict(_predictions: pd.DataFrame, model='XGBoost_v1_all_models', **kwargs) -> dict:
+    def forecasted_power_to_dict(_predictions: pd.DataFrame, model='XGBoost_pv_v1_all_models', **kwargs) -> dict:
         predictions = _predictions.sort_values(by='datetime').copy()
         values = []
         for index, row in predictions.iterrows():
@@ -176,7 +177,7 @@ class PVPredict():
                 'capacity': kwargs['pv'].capacity,
                 'unit': 'kW',
                 'model': model,
-                'date_run' : pd.Timestamp.now(tz='UTC') if 'date_run' not in kwargs else kwargs['date_run'],
+                'date_run' : pd.Timestamp.now(tz='Asia/Nicosia') if 'date_run' not in kwargs else kwargs['date_run'],
                 'forecasted_dates' : f"{values[0]['Timestamp']} to {values[-1]['Timestamp']}",
                 'values': values
             }
