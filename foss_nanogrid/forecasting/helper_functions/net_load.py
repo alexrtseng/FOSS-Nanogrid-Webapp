@@ -34,7 +34,7 @@ def preds_to_net_load_dict(
                 "Timestamp": row["datetime"],
                 "PV": row["pv_pred"],
                 "Load": row["load_pred"],
-                "Net Load": row["net_load"],
+                "Net-Load": row["net_load"],
             }
         )
 
