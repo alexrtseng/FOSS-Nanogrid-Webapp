@@ -11,7 +11,7 @@ class PVPanel(models.Model):
     )
     inclination = models.FloatField(verbose_name="Inclination")
     azimuth = models.FloatField(verbose_name="Azimuth")
-    capacity = models.FloatField(verbose_name="Capacity")
+    capacity = models.FloatField(verbose_name="Capacity") # in MW
 
 class Prediction(models.Model):
     pv = models.ForeignKey(PVPanel, on_delete=models.CASCADE)
