@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "data_collection",
     "metrics",
     "forecasting",
+    "optimization",
 ]
 
 MIDDLEWARE = [

@@ -22,5 +22,6 @@ urlpatterns = [
     path("data-collection/", include("data_collection.urls")),
     path("metrics/", include("metrics.urls")),
     path("forecasting/", include("forecasting.urls")),
+    path("optimization/", include("optimization.urls")),
     path("admin/", admin.site.urls),
 ]
