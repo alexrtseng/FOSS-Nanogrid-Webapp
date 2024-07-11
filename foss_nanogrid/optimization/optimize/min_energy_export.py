@@ -45,20 +45,20 @@ class MinEnergyExport:
         # Define the Soc Constraint
         def soc_constraint(x):
             soc = np.zeros(pred_net_load.shape[0] + 1)  # in MWh
-            soc[0] = 0.5 * self.ess.capacity
+            soc[0] = 0.5
 
             for t in range(pred_net_load.shape[0]):
                 soc[t + 1] = (
                     soc[t]
                     - (
-                        (x[t] * self.ess.discharge_efficiency)
+                        (x[t] * self.ess.discharge_efficiency / self.ess.capacity)
                         if x[t] > 0
-                        else x[t] * self.ess.charge_efficiency
+                        else x[t] * self.ess.charge_efficiency / self.ess.capacity
                     )
-                    - self.ess.self_discharge * soc[t] * self.ess.capacity
+                    - self.ess.self_discharge * soc[t]
                 )
 
-            return self.ess.pref_max_soc * self.ess.capacity - soc, soc - self.ess.pref_min_soc * self.ess.capacity
+            return self.ess.pref_max_soc - soc, soc - self.ess.pref_min_soc
 
         # Define battery max charge constraint
         def charge_constraint(x):
@@ -82,7 +82,6 @@ class MinEnergyExport:
             constraints=self._get_constraints(pred_net_load),
             options={'maxiter': 4000, 'disp': True}
         )
-        log.info(result)
 
         if result.success:
             # Calculate the state of charge for each time step
@@ -90,12 +89,12 @@ class MinEnergyExport:
             for i in range(pred_net_load.shape[0]):
                 soc[i] = (
                     (0.5 if i == 0 else soc[i - 1])
-                    + (
-                        (-1 * result.x[i] * self.ess.discharge_efficiency)
+                    - (
+                        (result.x[i] * self.ess.discharge_efficiency / self.ess.capacity)
                         if result.x[i] > 0
-                        else result.x[i] * self.ess.charge_efficiency
+                        else result.x[i] * self.ess.charge_efficiency / self.ess.capacity
                     )
-                    - self.ess.self_discharge * soc[i - 1] * self.ess.capacity
+                    - self.ess.self_discharge * (0.5 if i == 0 else soc[i - 1])
                 )
 
             return result.x, soc
