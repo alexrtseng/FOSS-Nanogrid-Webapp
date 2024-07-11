@@ -5,8 +5,11 @@ class ESS(models.Model):
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=250)
     capacity = models.FloatField(verbose_name="Capacity") # in MWh
-    max_power = models.FloatField(verbose_name="Max Power") # in MW
-    efficiency = models.FloatField(verbose_name="Efficiency") # in percentage
-    rte = models.FloatField(verbose_name="Round Trip Efficiency") # in percentage
-    sd = models.FloatField(verbose_name="Self Discharge") # in percentage per hour
-    dd = models.FloatField(verbose_name="Depth of Discharge") # in percentage
+    max_charge = models.FloatField(verbose_name="Max Power") # in MW
+    max_discharge = models.FloatField(verbose_name="Max Discharge Power") # in MW
+    charge_efficiency = models.FloatField(verbose_name="Charge Efficiency") # in percentage
+    discharge_efficiency = models.FloatField(verbose_name="Discharge Efficiency") # in percentage
+    self_discharge = models.FloatField(verbose_name="Self Discharge") # in percentage per hour
+    depth_of_discharge = models.FloatField(verbose_name="Depth of Discharge") # in percentage
+    pref_max_soc = models.FloatField(verbose_name="Preferred Max SOC") # in percentage
+    pref_min_soc = models.FloatField(verbose_name="Preferred Min SOC") # in percentage
