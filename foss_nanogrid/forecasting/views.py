@@ -1,11 +1,9 @@
-from turtle import st
-from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 
 from data_collection.models import SmartMeter
-from .helper_functions.net_load import preds_to_net_load_dict
+from .helper_functions.net_load import calc_net_load, preds_to_net_load_dict
 from .helper_functions.views_helper import (
     start_end_time_valid,
     num_req_calls_valid,
@@ -16,8 +14,7 @@ from .pv_forecasting.pv_forecasting_predict import PVPredict
 from .models import PVPanel
 import pandas as pd
 import logging
-import math
-
+from optimization.optimize.min_energy_export import MinEnergyExport
 log = logging.getLogger(__name__)
 
 
@@ -203,13 +200,28 @@ def forecast_net_load(request):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     # Calculate net load
-    net_load = preds_to_net_load_dict(
-        pv_predictions=pv_predictions,
-        load_predictions=load_predictions,
+    net_load = calc_net_load(pv_predictions, load_predictions)
+    
+    net_load_dict = preds_to_net_load_dict(
+        net_load,
         sm_name=sm.field_name,
         pv_name=pv_name,
         latitude=pv.latitude,
         longitude=pv.longitude
     )
 
-    return Response(net_load, status=status.HTTP_200_OK)
+    # Add export energy minimization for future-ucy-battery if requestested in params
+    if 'ess_optimization' in request.query_params:
+        if request.query_params['ess_optimization'].lower() == 'energy_export':
+            minimizer = MinEnergyExport()
+            pred_net_load = net_load['net_load'].values
+            charge_rate, soc = minimizer.optimize(pred_net_load)  # Charge rate is in MWh in that time point
+            if isinstance(charge_rate, bool) or isinstance(soc, bool):
+                log.info("Failure in optimization")
+                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            charge_rate = charge_rate / (resolution / (60 if min_resolution else 1))  # Convert to MW
+            for i, time_point in enumerate(net_load_dict['values']):
+                time_point['Optimal Charge Rate'] = charge_rate[i]
+                time_point['State of Charge'] = soc[i]
+
+    return Response(net_load_dict, status=status.HTTP_200_OK)

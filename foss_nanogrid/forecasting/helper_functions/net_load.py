@@ -17,16 +17,14 @@ def calc_net_load(
 
 # Given df of pv predictions and df of load predictions, return dict of predictions with general info as well
 def preds_to_net_load_dict(
-    pv_predictions: pd.DataFrame,
-    load_predictions: pd.DataFrame,
+    df,
     sm_name,
     pv_name,
     latitude,
     longitude,
     pv_model="XGBoost_pv_v1",
     load_model="XGBoost_load_v4",
-) -> dict:
-    df = calc_net_load(pv_predictions, load_predictions)
+) -> dict:  
     values = []
     for _, row in df.iterrows():
         values.append(

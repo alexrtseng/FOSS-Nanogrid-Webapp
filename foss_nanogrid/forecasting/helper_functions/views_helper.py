@@ -40,7 +40,7 @@ def get_forecast_params(request):
     start = request.query_params["start"]
     end = request.query_params["end"]
     if "resolution" in request.query_params:
-        resolution = request.query_params["resolution"]
+        resolution = int(request.query_params["resolution"])
     else:
         resolution = 30
     if "min_resolution" in request.query_params:
